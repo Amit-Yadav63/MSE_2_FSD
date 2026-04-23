@@ -12,8 +12,13 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// ✅ Root route (ADD THIS)
+app.get("/", (req, res) => {
+  res.send("Backend is live 🚀");
+});
+
 // Routes
-app.use('/api', authRoutes); // /api/register, /api/login
+app.use('/api', authRoutes);
 app.use('/api/items', itemRoutes);
 
 const { MongoMemoryServer } = require('mongodb-memory-server');
@@ -23,7 +28,6 @@ let MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/lost-and-fou
 
 const connectDB = async () => {
   try {
-    // Try to connect to the given URI, but catch the error quickly (2s timeout)
     mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 2000 })
       .then(() => {
         console.log('Connected to MongoDB');
@@ -32,7 +36,7 @@ const connectDB = async () => {
         });
       })
       .catch(async () => {
-        console.log('Failed to connect to local MongoDB. Starting in-memory MongoDB for demonstration...');
+        console.log('Failed to connect. Using in-memory DB...');
         const mongoServer = await MongoMemoryServer.create();
         const inMemoryUri = mongoServer.getUri();
         await mongoose.connect(inMemoryUri);
